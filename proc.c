@@ -532,3 +532,65 @@ procdump(void)
     cprintf("\n");
   }
 }
+
+int
+countprocs(void)
+{
+  struct proc *p;
+  int count = 0;
+
+  acquire(&ptable.lock);
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->state != UNUSED)
+      count++;
+  }
+  release(&ptable.lock);
+
+  return count;
+}
+
+
+void
+schedinfo(void)
+{
+  struct proc *p;
+
+  acquire(&ptable.lock);
+  cprintf("PID\tNAME\tSTATE\n");
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->state == UNUSED)
+      continue;
+
+    cprintf("%d\t%s\t", p->pid, p->name);
+
+    switch(p->state){
+      case RUNNING:  cprintf("RUNNING\n"); break;
+      case RUNNABLE: cprintf("RUNNABLE\n"); break;
+      case SLEEPING: cprintf("SLEEPING\n"); break;
+      default:       cprintf("OTHER\n");
+    }
+  }
+  release(&ptable.lock);
+}
+
+void
+get_schedinfo(int *running, int *runnable, int *sleeping)
+{
+  struct proc *p;
+
+  *running = 0;
+  *runnable = 0;
+  *sleeping = 0;
+
+  acquire(&ptable.lock);
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->state == RUNNING)
+      (*running)++;
+    else if(p->state == RUNNABLE)
+      (*runnable)++;
+    else if(p->state == SLEEPING)
+      (*sleeping)++;
+  }
+  release(&ptable.lock);
+}
+

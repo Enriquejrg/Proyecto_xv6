@@ -126,6 +126,8 @@ static int (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
+[SYS_schedinfo] sys_schedinfo,
+
 };
 
 static char *syscallnames[] = {
@@ -160,8 +162,9 @@ syscall(void)
 
   num = curproc->tf->eax;
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-    if(syscallnames[num])
-      cprintf("syscall: %s\n", syscallnames[num]);
+    if(syscallnames[num] && num != SYS_write)
+    cprintf("syscall: %s\n", syscallnames[num]);
+
 
 	curproc->tf->eax = syscalls[num]();
   } else {

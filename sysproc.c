@@ -83,9 +83,30 @@ int
 sys_uptime(void)
 {
   uint xticks;
+  int nprocs;
 
   acquire(&tickslock);
   xticks = ticks;
   release(&tickslock);
-  return xticks;
+
+  nprocs = countprocs();
+
+  return (xticks << 16) | (nprocs & 0xFFFF);
 }
+
+
+int
+sys_schedinfo(void)
+{
+  int running, runnable, sleeping;
+
+  get_schedinfo(&running, &runnable, &sleeping);
+
+  cprintf("Procesos:\n");
+  cprintf(" RUNNING : %d\n", running);
+  cprintf(" RUNNABLE: %d\n", runnable);
+  cprintf(" SLEEPING: %d\n", sleeping);
+
+  return 0;
+}
+

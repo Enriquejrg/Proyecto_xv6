@@ -10,6 +10,11 @@ struct sleeplock;
 struct stat;
 struct superblock;
 
+int countprocs(void);
+void schedinfo(void);
+int sys_schedinfo(void);
+void get_schedinfo(int*, int*, int*);
+
 // bio.c
 void            binit(void);
 struct buf*     bread(uint, uint);
